@@ -1,0 +1,61 @@
+/* Cornerstone — Reading text, chapters 9–16 (1689 LBCF, modern English rendering). */
+(function () {
+  const R = (window.READING = window.READING || {});
+
+  R[9] = [
+    "God has endowed the will of man with that natural liberty and power to act upon choice, so that it is neither forced, nor by any necessity of nature determined, to do good or evil.",
+    "Man, in his state of innocence, had freedom and power to will and to do that which was good and well-pleasing to God; but he was unstable, so that he might fall from it.",
+    "Man, by his fall into a state of sin, has wholly lost all ability of will to any spiritual good accompanying salvation; so that, being a natural man and altogether averse from that good, and dead in sin, he is not able by his own strength to convert himself, or to prepare himself for it.",
+    "When God converts a sinner and brings him into the state of grace, he frees him from his natural bondage under sin, and by his grace alone enables him freely to will and to do that which is spiritually good; yet because of his remaining corruption, he does not perfectly, nor only, will that which is good, but also wills that which is evil.",
+    "The will of man is made perfectly and immutably free to do good alone in the state of glory only.",
+  ];
+
+  R[10] = [
+    "Those whom God has predestined to life, he is pleased in his appointed and accepted time effectually to call, by his Word and Spirit, out of the state of sin and death in which they are by nature, to grace and salvation by Jesus Christ. He enlightens their minds spiritually and savingly to understand the things of God; takes away their heart of stone and gives them a heart of flesh; renews their wills, and by his almighty power turns them to that which is good, effectually drawing them to Jesus Christ; yet so that they come most freely, being made willing by his grace.",
+    "This effectual call is of God's free and special grace alone, not from anything at all foreseen in man, nor from any power or agency in the creature, who is wholly passive in it until, being made alive and renewed by the Holy Spirit, he is thereby enabled to answer this call and to embrace the grace offered and conveyed in it — and that by no less power than the same which raised up Christ from the dead.",
+    "Elect infants dying in infancy are regenerated and saved by Christ through the Spirit, who works when, where, and how he pleases; so also are all other elect persons who are incapable of being outwardly called by the ministry of the Word.",
+    "Others, not elected, although they may be called by the ministry of the Word, and may have some common operations of the Spirit, yet, not being effectually drawn by the Father, neither will nor can truly come to Christ, and therefore cannot be saved; much less can men who do not receive the Christian religion be saved, however diligent they are to frame their lives according to the light of nature and the law of that religion they profess.",
+  ];
+
+  R[11] = [
+    "Those whom God effectually calls, he also freely justifies — not by infusing righteousness into them, but by pardoning their sins, and accounting and accepting them as righteous; not for anything worked in them or done by them, but for Christ's sake alone; not by imputing faith itself, the act of believing, or any other evangelical obedience to them as their righteousness, but by imputing Christ's active obedience to the whole law and passive obedience in his death as their whole and sole righteousness — they receiving and resting on him and his righteousness by faith, which faith they do not have of themselves; it is the gift of God.",
+    "Faith, thus receiving and resting on Christ and his righteousness, is the only instrument of justification; yet it is not alone in the person justified, but is always accompanied by all other saving graces, and is no dead faith, but works by love.",
+    "Christ, by his obedience and death, fully discharged the debt of all those who are justified; and by the sacrifice of himself in the blood of his cross, undergoing in their place the penalty due to them, he made a proper, real, and full satisfaction to God's justice on their behalf. Yet, since he was given by the Father for them, and his obedience and satisfaction accepted in their place — and both freely, not for anything in them — their justification is only of free grace, that both the exact justice and the rich grace of God might be glorified in the justification of sinners.",
+    "God decreed from all eternity to justify all the elect; and in the fullness of time Christ died for their sins and rose again for their justification; nevertheless they are not justified personally until the Holy Spirit in due time actually applies Christ to them.",
+    "God continues to forgive the sins of those who are justified; and although they can never fall from the state of justification, yet they may, by their sins, fall under God's fatherly displeasure, and not have the light of his countenance restored to them until they humble themselves, confess their sins, beg pardon, and renew their faith and repentance.",
+    "The justification of believers under the Old Testament was, in all these respects, one and the same with the justification of believers under the New Testament.",
+  ];
+
+  R[12] = [
+    "God has granted that all those who are justified should, in and for the sake of his only Son Jesus Christ, partake of the grace of adoption; by which they are taken into the number, and enjoy the liberties and privileges, of the children of God; have his name put upon them; receive the Spirit of adoption; have access to the throne of grace with boldness; are enabled to cry, \u201cAbba, Father\u201d; are pitied, protected, provided for, and chastened by him as by a father; yet are never cast off, but, being sealed to the day of redemption, inherit the promises as heirs of everlasting salvation.",
+  ];
+
+  R[13] = [
+    "Those who are united to Christ, effectually called, and regenerated, having a new heart and a new spirit created in them through the virtue of Christ's death and resurrection, are also further sanctified, really and personally, through the same virtue, by his Word and Spirit dwelling in them. The dominion of the whole body of sin is destroyed, and its various lusts are more and more weakened and mortified, and they are more and more enlivened and strengthened in all saving graces, to the practice of all true holiness, without which no one shall see the Lord.",
+    "This sanctification is throughout the whole man, yet imperfect in this life; some remnants of corruption remain in every part, from which arises a continual and irreconcilable war — the flesh lusting against the Spirit, and the Spirit against the flesh.",
+    "In this war, although the remaining corruption may for a time greatly prevail, yet, through the continual supply of strength from the sanctifying Spirit of Christ, the regenerate part overcomes; and so the saints grow in grace, perfecting holiness in the fear of God, pressing after a heavenly life in evangelical obedience to all the commands which Christ, as Head and King, has prescribed for them in his Word.",
+  ];
+
+  R[14] = [
+    "The grace of faith, by which the elect are enabled to believe to the saving of their souls, is the work of the Spirit of Christ in their hearts, and is ordinarily worked by the ministry of the Word; by which also, and by the administration of baptism and the Lord's Supper, prayer, and other means appointed by God, it is increased and strengthened.",
+    "By this faith a Christian believes to be true whatever is revealed in the Word, for the authority of God himself; and acts differently upon that which each particular passage contains — yielding obedience to the commands, trembling at the threatenings, and embracing the promises of God for this life and that which is to come. But the principal acts of saving faith have immediate relation to Christ — accepting, receiving, and resting upon him alone for justification, sanctification, and eternal life, by virtue of the covenant of grace.",
+    "This faith, though differing in degrees, and being weak or strong, is yet, even in its weakest measure, different in kind from the faith and common grace of temporary believers. Therefore, though it may be many times assailed and weakened, it gains the victory, growing up in many to the attainment of a full assurance through Christ, who is both the author and finisher of our faith.",
+  ];
+
+  R[15] = [
+    "Such of the elect as are converted at riper years, having for some time lived in the state of nature and served various lusts and pleasures, God in their effectual calling gives them repentance unto life.",
+    "Since there is no one who does good and does not sin, and the best of men may, through the power and deceitfulness of the corruption dwelling in them, together with the strength of temptation, fall into great sins and provocations, God has, in the covenant of grace, mercifully provided that believers who so sin and fall are renewed through repentance unto salvation.",
+    "This saving repentance is an evangelical grace, by which a person who is made aware, by the Holy Spirit, of the many evils of his sin, does, by faith in Christ, humble himself for it with godly sorrow, detestation of it, and self-abhorrence; praying for pardon and strength of grace, with a purpose and endeavor, by the supplies of the Spirit, to walk before God to the praise of all well-pleasing in all things.",
+    "As repentance is to be continued throughout the whole course of our lives, because of the body of death and its motions, so it is every person's duty to repent of his particular known sins, particularly.",
+  ];
+
+  R[16] = [
+    "Good works are only those which God has commanded in his holy Word, and not those which, without its warrant, are devised by men out of blind zeal, or upon any pretense of good intentions.",
+    "These good works, done in obedience to God's commandments, are the fruits and evidences of a true and living faith; and by them believers manifest their thankfulness, strengthen their assurance, edify their brothers and sisters, adorn the profession of the gospel, stop the mouths of adversaries, and glorify God, whose workmanship they are, created in Christ Jesus for that purpose; that, bearing fruit unto holiness, they may have their end, eternal life.",
+    "Their ability to do good works is not at all from themselves, but wholly from the Spirit of Christ; and so that they may be enabled to it, besides the graces they have already received, there is necessary an actual influence of the same Holy Spirit to work in them to will and to do of his good pleasure. Yet they are not to grow negligent on this account, but ought to be diligent in stirring up the grace of God that is in them.",
+    "Those who attain the greatest height of obedience possible in this life are so far from being able to do more than God requires that they fall short of much which in duty they are bound to do.",
+    "We cannot, by our best works, merit pardon of sin or eternal life at the hand of God, because of the great disproportion between them and the glory to come, and the infinite distance between us and God; when we have done all we can, we have done only our duty, and are unprofitable servants. And because, as they are good, they proceed from his Spirit, and as they are done by us, they are defiled and mixed with so much weakness and imperfection that they cannot endure the severity of God's judgment.",
+    "Yet, the persons of believers being accepted through Christ, their good works are also accepted in him; not as though they were in this life wholly blameless in God's sight, but that he, looking upon them in his Son, is pleased to accept and reward that which is sincere, although accompanied by many weaknesses and imperfections.",
+    "Works done by unregenerate men, although for their matter they may be things which God commands, and of good use both to themselves and others, yet, because they do not proceed from a heart purified by faith, nor are done in a right manner according to the Word, nor to a right end, the glory of God, are therefore sinful, and cannot please God.",
+  ];
+})();

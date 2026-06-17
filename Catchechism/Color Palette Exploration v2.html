@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cornerstone — Red & Yellow Color Palettes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;0,700;0,800;0,900;1,700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
+    body { background: #f5f5f5; padding: 40px 20px; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 { text-align: center; color: #222; margin: 0 0 50px; font-size: 36px; }
+    .palette-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 60px; }
+    .palette { border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: white; }
+    .palette-header { padding: 20px; background: #222; color: white; }
+    .palette-name { font-size: 22px; font-weight: 900; margin: 0; }
+    .palette-desc { font-size: 13px; margin: 6px 0 0; opacity: 0.8; }
+    .color-rows { display: flex; flex-direction: column; }
+    .color-row { display: flex; min-height: 80px; }
+    .color-swatch { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; border-right: 1px solid #eee; cursor: pointer; transition: filter 0.2s; }
+    .color-swatch:hover { filter: brightness(1.05); }
+    .color-swatch:last-child { border-right: none; }
+    .color-name { font-size: 12px; font-weight: 700; color: #666; margin-top: 4px; }
+    .color-hex { font-size: 11px; color: #999; font-family: monospace; }
+
+    .color-swatch.light .color-name { color: #333; }
+    .color-swatch.light .color-hex { color: #666; }
+    .color-swatch.dark .color-name { color: #fff; }
+    .color-swatch.dark .color-hex { color: rgba(255,255,255,0.7); }
+
+    .mockup { margin-top: 40px; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .mockup-title { font-size: 18px; font-weight: 900; margin: 0 0 20px; color: #222; }
+    .mockup-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .mockup-card { padding: 16px; border-radius: 12px; }
+    .mockup-card h3 { margin: 0 0 12px; font-size: 16px; font-weight: 700; }
+    .mockup-card p { margin: 0; font-size: 13px; line-height: 1.5; }
+    .btn { padding: 10px 16px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; font-size: 13px; margin-top: 10px; }
+    .btn-primary { color: white; }
+    .btn-secondary { border: 2px solid; }
+    
+    .recommendation { text-align: center; margin-top: 60px; padding: 40px; background: white; border-radius: 12px; color: #666; border-left: 6px solid #d63031; }
+    .recommendation h2 { color: #222; margin-top: 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Red & Yellow Color Palettes</h1>
+
+    <div class="palette-grid">
+      <!-- Option 1: Warm & Bold (Red + Gold Yellow + Black) -->
+      <div class="palette">
+        <div class="palette-header">
+          <h3 class="palette-name">Warm & Bold</h3>
+          <p class="palette-desc">Red + gold yellow with black — warm, energetic, inviting</p>
+        </div>
+        <div class="color-rows">
+          <div class="color-row">
+            <div class="color-swatch dark" style="background: #1a1a1a;"><div><div class="color-name">Black</div><div class="color-hex">#1a1a1a</div></div></div>
+            <div class="color-swatch dark" style="background: #d63031;"><div><div class="color-name">Red</div><div class="color-hex">#d63031</div></div></div>
+            <div class="color-swatch dark" style="background: #f39c12;"><div><div class="color-name">Gold Yellow</div><div class="color-hex">#f39c12</div></div></div>
+            <div class="color-swatch light" style="background: #ffffff;"><div><div class="color-name">White</div><div class="color-hex">#ffffff</div></div></div>
+          </div>
+          <div class="color-row">
+            <div class="color-swatch dark" style="background: #8b1428;"><div><div class="color-name">Red Deep</div><div class="color-hex">#8b1428</div></div></div>
+            <div class="color-swatch light" style="background: #f0d5d8;"><div><div class="color-name">Red Wash</div><div class="color-hex">#f0d5d8</div></div></div>
+            <div class="color-swatch dark" style="background: #d68910;"><div><div class="color-name">Gold Deep</div><div class="color-hex">#d68910</div></div></div>
+            <div class="color-swatch light" style="background: #fef5e7;"><div><div class="color-name">Yellow Wash</div><div class="color-hex">#fef5e7</div></div></div>
+          </div>
+        </div>
+        <div class="mockup">
+          <div class="mockup-title">Preview</div>
+          <div class="mockup-content">
+            <div class="mockup-card" style="background: #1a1a1a; border-left: 5px solid #f39c12;">
+              <h3 style="color: #f39c12;">Daily Goal</h3>
+              <p style="color: rgba(255,255,255,0.85);">50 XP to unlock tomorrow's reward</p>
+              <button class="btn btn-primary" style="background: #d63031;">Complete</button>
+            </div>
+            <div class="mockup-card" style="background: #f39c12;">
+              <h3 style="color: #1a1a1a;">Streak 🔥</h3>
+              <p style="color: rgba(0,0,0,0.85);">7-day learning streak — keep it burning!</p>
+            </div>
+            <div class="mockup-card" style="background: #ffffff; border: 2px solid #d63031;">
+              <h3 style="color: #1a1a1a;">Lesson</h3>
+              <p style="color: #8b1428;">Chapter 2: Of God and the Trinity</p>
+              <button class="btn btn-secondary" style="border-color: #d63031; color: #d63031;">Start</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option 2: Vibrant Energy (Scarlet + Sunny Yellow) -->
+      <div class="palette">
+        <div class="palette-header">
+          <h3 class="palette-name">Vibrant Energy</h3>
+          <p class="palette-desc">Scarlet + sunny yellow — high energy, youthful, joyful learning</p>
+        </div>
+        <div class="color-rows">
+          <div class="color-row">
+            <div class="color-swatch dark" style="background: #1f1f1f;"><div><div class="color-name">Charcoal</div><div class="color-hex">#1f1f1f</div></div></div>
+            <div class="color-swatch dark" style="background: #e74c3c;"><div><div class="color-name">Scarlet</div><div class="color-hex">#e74c3c</div></div></div>
+            <div class="color-swatch dark" style="background: #f1c40f;"><div><div class="color-name">Sunny Yellow</div><div class="color-hex">#f1c40f</div></div></div>
+            <div class="color-swatch light" style="background: #fafafa;"><div><div class="color-name">Off White</div><div class="color-hex">#fafafa</div></div></div>
+          </div>
+          <div class="color-row">
+            <div class="color-swatch dark" style="background: #c0392b;"><div><div class="color-name">Scarlet Deep</div><div class="color-hex">#c0392b</div></div></div>
+            <div class="color-swatch light" style="background: #fadbd8;"><div><div class="color-name">Red Wash</div><div class="color-hex">#fadbd8</div></div></div>
+            <div class="color-swatch light" style="background: #f9e79f;"><div><div class="color-name">Yellow Wash</div><div class="color-hex">#f9e79f</div></div></div>
+            <div class="color-swatch dark" style="background: #7f8c8d;"><div><div class="color-name">Gray</div><div class="color-hex">#7f8c8d</div></div></div>
+          </div>
+        </div>
+        <div class="mockup">
+          <div class="mockup-title">Preview</div>
+          <div class="mockup-content">
+            <div class="mockup-card" style="background: #f1c40f;">
+              <h3 style="color: #1f1f1f;">Achievement Unlocked!</h3>
+              <p style="color: rgba(0,0,0,0.85);">You completed Chapter 1 with no hearts lost 🏆</p>
+            </div>
+            <div class="mockup-card" style="background: #e74c3c;">
+              <h3 style="color: #ffffff;">Quick Review</h3>
+              <p style="color: rgba(255,255,255,0.9);">8 challenging questions from your weak spots</p>
+              <button class="btn btn-primary" style="background: #c0392b;">Start Practice</button>
+            </div>
+            <div class="mockup-card" style="background: #fafafa; border: 2px solid #e74c3c;">
+              <h3 style="color: #1f1f1f;">Next Lesson</h3>
+              <p style="color: #7f8c8d;">Ready to begin? Let's dive in.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option 3: Sacred Flame (Deep Red + Amber) -->
+      <div class="palette">
+        <div class="palette-header">
+          <h3 class="palette-name">Sacred Flame</h3>
+          <p class="palette-desc">Deep red + amber yellow — biblical, warm, contemplative</p>
+        </div>
+        <div class="color-rows">
+          <div class="color-row">
+            <div class="color-swatch dark" style="background: #2c1810;"><div><div class="color-name">Deep Brown</div><div class="color-hex">#2c1810</div></div></div>
+            <div class="color-swatch dark" style="background: #a41e34;"><div><div class="color-name">Deep Red</div><div class="color-hex">#a41e34</div></div></div>
+            <div class="color-swatch dark" style="background: #d4af37;"><div><div class="color-name">Amber Gold</div><div class="color-hex">#d4af37</div></div></div>
+            <div class="color-swatch light" style="background: #f5f1e8;"><div><div class="color-name">Cream</div><div class="color-hex">#f5f1e8</div></div></div>
+          </div>
+          <div class="color-row">
+            <div class="color-swatch dark" style="background: #6b1423;"><div><div class="color-name">Red Deep</div><div class="color-hex">#6b1423</div></div></div>
+            <div class="color-swatch light" style="background: #f2d7d5;"><div><div class="color-name">Red Wash</div><div class="color-hex">#f2d7d5</div></div></div>
+            <div class="color-swatch light" style="background: #f7e8c8;"><div><div class="color-name">Amber Wash</div><div class="color-hex">#f7e8c8</div></div></div>
+            <div class="color-swatch dark" style="background: #6b6b6b;"><div><div class="color-name">Gray Stone</div><div class="color-hex">#6b6b6b</div></div></div>
+          </div>
+        </div>
+        <div class="mockup">
+          <div class="mockup-title">Preview</div>
+          <div class="mockup-content">
+            <div class="mockup-card" style="background: #f5f1e8; border-left: 6px solid #a41e34;">
+              <h3 style="color: #2c1810;">Verse of the Day</h3>
+              <p style="color: #6b6b6b;">"The fear of the Lord is the beginning of wisdom." — Proverbs 9:10</p>
+              <button class="btn btn-primary" style="background: #a41e34;">Meditate</button>
+            </div>
+            <div class="mockup-card" style="background: #a41e34;">
+              <h3 style="color: #f5f1e8;">Today's Study</h3>
+              <p style="color: rgba(255,255,255,0.9);">Chapter 5: Of Divine Providence</p>
+            </div>
+            <div class="mockup-card" style="background: #d4af37;">
+              <h3 style="color: #2c1810;">Progress</h3>
+              <p style="color: #6b1423;">5 of 32 chapters completed</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option 4: Modern Warm (Coral Red + Mustard Yellow) -->
+      <div class="palette">
+        <div class="palette-header">
+          <h3 class="palette-name">Modern Warm</h3>
+          <p class="palette-desc">Coral red + mustard yellow — contemporary, warm, approachable</p>
+        </div>
+        <div class="color-rows">
+          <div class="color-row">
+            <div class="color-swatch dark" style="background: #1a1a1a;"><div><div class="color-name">Black</div><div class="color-hex">#1a1a1a</div></div></div>
+            <div class="color-swatch dark" style="background: #e85d5d;"><div><div class="color-name">Coral Red</div><div class="color-hex">#e85d5d</div></div></div>
+            <div class="color-swatch dark" style="background: #d4a574;"><div><div class="color-name">Mustard</div><div class="color-hex">#d4a574</div></div></div>
+            <div class="color-swatch light" style="background: #fcfcfc;"><div><div class="color-name">White</div><div class="color-hex">#fcfcfc</div></div></div>
+          </div>
+          <div class="color-row">
+            <div class="color-swatch dark" style="background: #c94444;"><div><div class="color-name">Red Deep</div><div class="color-hex">#c94444</div></div></div>
+            <div class="color-swatch light" style="background: #f8d6d6;"><div><div class="color-name">Red Wash</div><div class="color-hex">#f8d6d6</div></div></div>
+            <div class="color-swatch light" style="background: #e8dcc8;"><div><div class="color-name">Mustard Wash</div><div class="color-hex">#e8dcc8</div></div></div>
+            <div class="color-swatch dark" style="background: #808080;"><div><div class="color-name">Gray</div><div class="color-hex">#808080</div></div></div>
+          </div>
+        </div>
+        <div class="mockup">
+          <div class="mockup-title">Preview</div>
+          <div class="mockup-content">
+            <div class="mockup-card" style="background: #1a1a1a;">
+              <h3 style="color: #d4a574;">Read the Confession</h3>
+              <p style="color: rgba(255,255,255,0.8);">32 chapters of biblical wisdom</p>
+              <button class="btn btn-primary" style="background: #e85d5d;">Start Reading</button>
+            </div>
+            <div class="mockup-card" style="background: #fcfcfc; border: 2px solid #e85d5d;">
+              <h3 style="color: #1a1a1a;">Your Progress</h3>
+              <p style="color: #808080;">Chapter 3, Lesson 2</p>
+            </div>
+            <div class="mockup-card" style="background: #d4a574;">
+              <h3 style="color: #1a1a1a;">Featured</h3>
+              <p style="color: #c94444;">Complete your daily study streak</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option 5: Fierce Passion (True Red + Bright Yellow + Black) -->
+      <div class="palette">
+        <div class="palette-header">
+          <h3 class="palette-name">Fierce Passion</h3>
+          <p class="palette-desc">Pure red + bright yellow + black — bold, commanding, unforgettable</p>
+        </div>
+        <div class="color-rows">
+          <div class="color-row">
+            <div class="color-swatch dark" style="background: #000000;"><div><div class="color-name">Black</div><div class="color-hex">#000000</div></div></div>
+            <div class="color-swatch dark" style="background: #cc0000;"><div><div class="color-name">Pure Red</div><div class="color-hex">#cc0000</div></div></div>
+            <div class="color-swatch dark" style="background: #ffcc00;"><div><div class="color-name">Bright Yellow</div><div class="color-hex">#ffcc00</div></div></div>
+            <div class="color-swatch light" style="background: #ffffff;"><div><div class="color-name">White</div><div class="color-hex">#ffffff</div></div></div>
+          </div>
+          <div class="color-row">
+            <div class="color-swatch dark" style="background: #990000;"><div><div class="color-name">Maroon</div><div class="color-hex">#990000</div></div></div>
+            <div class="color-swatch light" style="background: #ffe0e0;"><div><div class="color-name">Red Wash</div><div class="color-hex">#ffe0e0</div></div></div>
+            <div class="color-swatch light" style="background: #fff4d6;"><div><div class="color-name">Yellow Wash</div><div class="color-hex">#fff4d6</div></div></div>
+            <div class="color-swatch light" style="background: #e6e6e6;"><div><div class="color-name">Light Gray</div><div class="color-hex">#e6e6e6</div></div></div>
+          </div>
+        </div>
+        <div class="mockup">
+          <div class="mockup-title">Preview</div>
+          <div class="mockup-content">
+            <div class="mockup-card" style="background: #cc0000;">
+              <h3 style="color: #ffcc00;">⚡ DAILY CHALLENGE</h3>
+              <p style="color: rgba(255,255,255,0.95);">Answer 5 questions before midnight</p>
+              <button class="btn btn-primary" style="background: #990000;">Accept</button>
+            </div>
+            <div class="mockup-card" style="background: #ffffff; border: 3px solid #cc0000;">
+              <h3 style="color: #000000;">Quiz Complete</h3>
+              <p style="color: #cc0000;">You got 4 out of 5 correct!</p>
+            </div>
+            <div class="mockup-card" style="background: #ffcc00;">
+              <h3 style="color: #000000;">🏆 Achievement</h3>
+              <p style="color: #990000;">Unlock: "Scripture Master"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option 6: Sunset (Burnt Red + Golden Orange Yellow) -->
+      <div class="palette">
+        <div class="palette-header">
+          <h3 class="palette-name">Sunset</h3>
+          <p class="palette-desc">Burnt red + golden orange — warm, peaceful, inspiring</p>
+        </div>
+        <div class="color-rows">
+          <div class="color-row">
+            <div class="color-swatch dark" style="background: #1a1a1a;"><div><div class="color-name">Charcoal</div><div class="color-hex">#1a1a1a</div></div></div>
+            <div class="color-swatch dark" style="background: #c85a3a;"><div><div class="color-name">Burnt Red</div><div class="color-hex">#c85a3a</div></div></div>
+            <div class="color-swatch dark" style="background: #e8a342;"><div><div class="color-name">Golden Orange</div><div class="color-hex">#e8a342</div></div></div>
+            <div class="color-swatch light" style="background: #faf8f3;"><div><div class="color-name">Off White</div><div class="color-hex">#faf8f3</div></div></div>
+          </div>
+          <div class="color-row">
+            <div class="color-swatch dark" style="background: #9b4630;"><div><div class="color-name">Red Deep</div><div class="color-hex">#9b4630</div></div></div>
+            <div class="color-swatch light" style="background: #f5dcd5;"><div><div class="color-name">Red Wash</div><div class="color-hex">#f5dcd5</div></div></div>
+            <div class="color-swatch light" style="background: #f5e5d3;"><div><div class="color-name">Orange Wash</div><div class="color-hex">#f5e5d3</div></div></div>
+            <div class="color-swatch dark" style="background: #707070;"><div><div class="color-name">Neutral Gray</div><div class="color-hex">#707070</div></div></div>
+          </div>
+        </div>
+        <div class="mockup">
+          <div class="mockup-title">Preview</div>
+          <div class="mockup-content">
+            <div class="mockup-card" style="background: #faf8f3; border-left: 5px solid #c85a3a;">
+              <h3 style="color: #1a1a1a;">Peaceful Learning</h3>
+              <p style="color: #707070;">Settle in with a chapter of Scripture today.</p>
+              <button class="btn btn-primary" style="background: #c85a3a;">Begin</button>
+            </div>
+            <div class="mockup-card" style="background: #c85a3a;">
+              <h3 style="color: #faf8f3;">Streak Active 🔥</h3>
+              <p style="color: rgba(255,255,255,0.9);">5 days in a row — keep the momentum</p>
+            </div>
+            <div class="mockup-card" style="background: #e8a342;">
+              <h3 style="color: #1a1a1a;">Golden Progress</h3>
+              <p style="color: #9b4630;">12 of 32 chapters mastered</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="recommendation">
+      <h2>My Top Picks for Red & Yellow:</h2>
+      <p style="max-width: 700px; margin: 0 auto; line-height: 1.7;">
+        <strong style="color: #d63031;">🔥 Option 3 (Sacred Flame)</strong> — Deep red + amber gold is the most sophisticated and biblical. It feels reverent without being stuffy, and the amber works beautifully for secondary elements.<br><br>
+        <strong style="color: #e8a342;">☀️ Option 4 (Modern Warm)</strong> — Coral red + mustard is contemporary and approachable. Great for engaging younger learners while maintaining maturity.<br><br>
+        <strong style="color: #1a1a1a;">⚡ Option 5 (Fierce Passion)</strong> — Only if you want maximum impact. Pure red + bright yellow is striking but aggressive — good for CTAs and achievements, but use sparingly for UI chrome.<br><br>
+        **Avoid Option 2 (Vibrant Energy)** — The scarlet + sunny yellow is a bit too Duolingo-ish and might undermine the gravitas of Scripture study.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

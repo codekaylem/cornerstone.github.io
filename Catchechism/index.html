@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Cornerstone — Learn the 1689</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;0,700;0,800;0,900;1,700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: #e9e4da;
+    background-image: radial-gradient(circle at 50% 0%, #f1ece2, #e3ddd2);
+    font-family: 'Nunito', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+  #stageWrap { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+  #stage { transform-origin: center center; }
+  button { font-family: inherit; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+  @keyframes bob { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-5px); } }
+  @keyframes pulsering { 0% { transform: scale(.85); opacity: .6; } 100% { transform: scale(1.25); opacity: 0; } }
+  @keyframes sheetup { from { transform: translateY(40px); opacity: .4; } to { transform: translateY(0); opacity: 1; } }
+  /* the start-label bob keyframe needs a non-centered variant since it's not translateX'd */
+  @keyframes bob2 { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes popin { from { transform: scale(.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes pulse { 0%,100% { opacity: .45; } 50% { opacity: 1; } }
+  @keyframes tick { 0% { transform: scale(1); } 50% { transform: scale(1.18); } 100% { transform: scale(1); } }
+</style>
+</head>
+<body>
+  <div id="stageWrap"><div id="stage"><div id="root"></div></div></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script src="app/chapters-a.js"></script>
+  <script src="app/chapters-b.js"></script>
+  <script src="app/chapters-c.js"></script>
+  <script src="app/read-1.js"></script>
+  <script src="app/read-2.js"></script>
+  <script src="app/read-3.js"></script>
+  <script src="app/read-4.js"></script>
+  <script src="app/read-meta.js"></script>
+  <script src="app/data.js"></script>
+  <script type="text/babel" src="app/ios-frame.jsx"></script>
+  <script type="text/babel" src="app/ui.jsx"></script>
+  <script type="text/babel" src="app/questions.jsx"></script>
+  <script type="text/babel" src="app/lesson.jsx"></script>
+  <script type="text/babel" src="app/home.jsx"></script>
+  <script type="text/babel" src="app/profile.jsx"></script>
+  <script type="text/babel" src="app/achievements.jsx"></script>
+  <script type="text/babel" src="app/auth.jsx"></script>
+  <script type="text/babel" src="app/hearts.jsx"></script>
+  <script type="text/babel" src="app/onboarding.jsx"></script>
+  <script type="text/babel" src="app/read.jsx"></script>
+  <script type="text/babel" src="app/practice.jsx"></script>
+  <script type="text/babel" src="app/app.jsx"></script>
+
+  <script type="text/babel" data-presets="react">
+    const DEVICE_W = 402, DEVICE_H = 874;
+    function Root() {
+      return (
+        <IOSDevice width={DEVICE_W} height={DEVICE_H}>
+          <CornerstoneApp />
+        </IOSDevice>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<Root />);
+
+    function fit() {
+      const pad = 24;
+      const s = Math.min(
+        (window.innerWidth - pad) / DEVICE_W,
+        (window.innerHeight - pad) / DEVICE_H,
+        1.1
+      );
+      document.getElementById('stage').style.transform = 'scale(' + s + ')';
+    }
+    window.addEventListener('resize', fit);
+    setTimeout(fit, 0); setTimeout(fit, 300);
+  </script>
+</body>
+</html>
