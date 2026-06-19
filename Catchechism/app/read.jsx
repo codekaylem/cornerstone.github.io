@@ -66,23 +66,35 @@ async function fetchAiEsv(ref) {
   return { verses: data.verses, source: 'ai' };
 }
 
+// Normalize a citation for lookup (collapse whitespace, trim).
+function esvKey(ref) {
+  return String(ref || '').replace(/\s+/g, ' ').trim();
+}
+
 async function fetchEsv(ref) {
+  // 1) Local baked-in store (window.VERSES from app/verses.js) — instant, offline, no API.
+  const store = window.VERSES || {};
+  const local = store[esvKey(ref)] || store[ref];
+  if (local && local.verses && local.verses.length) {
+    return { verses: local.verses, source: 'local' };
+  }
+  // 2) localStorage cache from a prior live fetch.
   const cached = esvCacheGet(ref);
-  if (cached && cached.source === 'esv') return cached; // prefer cached ESV
-  if (cached && !cached.source) return cached; // old format, use as-is
-  try { 
+  if (cached && cached.source === 'esv') return cached;
+  if (cached && !cached.source) return cached;
+  // 3) Live Worker proxy (only works on the deployed origin).
+  try {
     const d = await bibleFetchPassage(ref);
     esvCacheSet(ref, d);
     return d;
   } catch (e) {
-    // ESV fetch failed (CORS, auth, etc) — fall back to AI
-    if (cached) return cached; // return stale AI cache if available
+    if (cached) return cached;
     const d = await fetchAiEsv(ref);
     esvCacheSet(ref, d);
     return d;
   }
 }
-Object.assign(window, { bibleFetchPassage });
+Object.assign(window, { bibleFetchPassage, esvKey });
 
 // ── A pinned chapter header that you can tap to open the chapter list ──
 function ChapterStickyHeader({ chapter, title, theme, onOpen }) {

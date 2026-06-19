@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cornerstone — ESV Verse Harvester (dev tool)</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, system-ui, sans-serif; background: #f0f2f5; color: #1a1a1a; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: #666; font-size: 14px; margin: 0 0 20px; line-height: 1.5; }
+  .card { background: #fff; border: 1px solid #dee2e6; border-radius: 12px; padding: 20px; margin-bottom: 18px; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  button { font: inherit; font-weight: 700; border: none; border-radius: 9px; padding: 11px 18px; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: default; }
+  .primary { background: #d63031; color: #fff; }
+  .ghost { background: #e8f0f7; color: #1e3a5f; }
+  .barwrap { height: 12px; background: #e9ecef; border-radius: 99px; overflow: hidden; margin: 14px 0 8px; }
+  .bar { height: 100%; width: 0; background: #1e3a5f; transition: width .15s; }
+  .stat { font-size: 13px; color: #555; font-variant-numeric: tabular-nums; }
+  label { font-size: 13px; color: #555; display: block; margin-bottom: 6px; font-weight: 700; }
+  input { width: 100%; font: inherit; padding: 9px 11px; border: 1px solid #ccc; border-radius: 8px; }
+  .log { font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; background: #1a1a1a; color: #c8d4e0; border-radius: 10px; padding: 14px; height: 220px; overflow: auto; white-space: pre-wrap; line-height: 1.5; }
+  .err { color: #ff8585; }
+  .ok { color: #7fd99a; }
+  .pill { font-size: 12px; font-weight: 800; padding: 3px 9px; border-radius: 99px; background: #ffe0e0; color: #a01e26; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>ESV Verse Harvester <span class="pill">DEV TOOL</span></h1>
+  <p class="sub">
+    Run this <strong>once, on the live site</strong> (codekaylem.github.io) — the only origin your
+    Cloudflare Worker allows. It reads every Scripture reference in the app, fetches the ESV text
+    through your Worker, then lets you download <code>app/verses.js</code>. Commit that file and the
+    app will load all verses locally — instant, offline, no API calls.
+  </p>
+
+  <div class="card">
+    <label for="worker">Worker URL</label>
+    <input id="worker" value="https://catchechism-esv.adriancalem.workers.dev" />
+    <div class="row" style="margin-top:14px;">
+      <button class="primary" id="go">Fetch all verses</button>
+      <button class="ghost" id="dl" disabled>Download verses.js</button>
+      <button class="ghost" id="copy" disabled>Copy to clipboard</button>
+    </div>
+    <div class="barwrap"><div class="bar" id="bar"></div></div>
+    <div class="stat" id="stat">Idle. Found <span id="count">0</span> unique references.</div>
+  </div>
+
+  <div class="card">
+    <div class="log" id="log">Loading reference list…</div>
+  </div>
+</div>
+
+<!-- Pull the real reference list straight from the app's metadata. -->
+<script src="app/read-meta.js"></script>
+<script>
+(function () {
+  var logEl = document.getElementById('log');
+  function log(msg, cls) {
+    var line = document.createElement('div');
+    if (cls) line.className = cls;
+    line.textContent = msg;
+    logEl.appendChild(line);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  // ── Collect every unique citation, exactly as the app keys them ──
+  function collectRefs() {
+    var META = window.READING_META || {};
+    var set = [];
+    var seen = {};
+    Object.keys(META).forEach(function (ch) {
+      (META[ch] || []).forEach(function (section) {
+        (section.r || []).forEach(function (refString) {
+          refString.split(';').forEach(function (tok) {
+            var key = tok.replace(/\s+/g, ' ').trim();
+            if (key && !seen[key]) { seen[key] = 1; set.push(key); }
+          });
+        });
+      });
+    });
+    return set;
+  }
+
+  // ── Parse the Worker's ESV-API JSON into [{n, t}] (same as the app) ──
+  function parsePassage(json) {
+    if (!json || json.error || !json.passages || !json.passages.length) return null;
+    var text = json.passages[0] || '';
+    var verses = [];
+    var re = /(\d+)\s+([^\d]*?)(?=\d+\s+|$)/g, m;
+    while ((m = re.exec(text)) !== null) {
+      var t = m[2].trim();
+      if (t) verses.push({ n: parseInt(m[1], 10), t: t });
+    }
+    return verses.length ? verses : null;
+  }
+
+  var refs = collectRefs();
+  document.getElementById('count').textContent = refs.length;
+  logEl.textContent = '';
+  log('Found ' + refs.length + ' unique references across ' +
+      Object.keys(window.READING_META || {}).length + ' chapters.');
+
+  var RESULT = {};
+  var running = false;
+
+  async function fetchOne(base, ref) {
+    var url = base.replace(/\/$/, '') + '/?q=' + encodeURIComponent(ref);
+    var res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var json = await res.json();
+    var verses = parsePassage(json);
+    if (!verses) throw new Error('no verses parsed');
+    return verses;
+  }
+
+  async function run() {
+    if (running) return;
+    running = true;
+    document.getElementById('go').disabled = true;
+    var base = document.getElementById('worker').value.trim();
+    var done = 0, failed = 0;
+    log('Starting fetch from ' + base + ' …');
+    for (var i = 0; i < refs.length; i++) {
+      var ref = refs[i];
+      try {
+        var verses = await fetchOne(base, ref);
+        RESULT[ref] = { verses: verses, source: 'esv' };
+        log('✓ ' + ref + '  (' + verses.length + ' v)', 'ok');
+      } catch (e) {
+        failed++;
+        log('✗ ' + ref + '  — ' + e.message, 'err');
+      }
+      done++;
+      document.getElementById('bar').style.width = (done / refs.length * 100) + '%';
+      document.getElementById('stat').textContent =
+        done + ' / ' + refs.length + ' done · ' + failed + ' failed';
+      await new Promise(function (r) { setTimeout(r, 120); }); // gentle rate-limit
+    }
+    log('\nDone. ' + (done - failed) + ' fetched, ' + failed + ' failed.',
+        failed ? 'err' : 'ok');
+    if (failed) log('Re-run to retry failures (successful ones are kept).');
+    document.getElementById('go').disabled = false;
+    document.getElementById('dl').disabled = false;
+    document.getElementById('copy').disabled = false;
+    running = false;
+  }
+
+  function buildFile() {
+    var header =
+      '/* Cornerstone — baked-in ESV verse store. GENERATED by verse-harvester.html.\n' +
+      '   ' + Object.keys(RESULT).length + ' references · ' + new Date().toISOString() + '\n' +
+      '   Scripture quotations from the ESV Bible. */\n';
+    return header + 'window.VERSES = ' + JSON.stringify(RESULT, null, 0) + ';\n';
+  }
+
+  document.getElementById('go').onclick = run;
+  document.getElementById('dl').onclick = function () {
+    var blob = new Blob([buildFile()], { type: 'text/javascript' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'verses.js';
+    a.click();
+    log('Downloaded verses.js — commit it to app/verses.js', 'ok');
+  };
+  document.getElementById('copy').onclick = function () {
+    navigator.clipboard.writeText(buildFile()).then(function () {
+      log('Copied verses.js contents to clipboard.', 'ok');
+    });
+  };
+})();
+</script>
+</body>
+</html>
