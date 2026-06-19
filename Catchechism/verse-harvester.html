@@ -1,176 +1,383 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Cornerstone — ESV Verse Harvester (dev tool)</title>
+<title>Cornerstone — Verse Harvester</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Lora:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: -apple-system, system-ui, sans-serif; background: #f0f2f5; color: #1a1a1a; }
-  .wrap { max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; }
-  h1 { font-size: 22px; margin: 0 0 4px; }
-  .sub { color: #666; font-size: 14px; margin: 0 0 20px; line-height: 1.5; }
-  .card { background: #fff; border: 1px solid #dee2e6; border-radius: 12px; padding: 20px; margin-bottom: 18px; }
-  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-  button { font: inherit; font-weight: 700; border: none; border-radius: 9px; padding: 11px 18px; cursor: pointer; }
-  button:disabled { opacity: .5; cursor: default; }
-  .primary { background: #d63031; color: #fff; }
-  .ghost { background: #e8f0f7; color: #1e3a5f; }
-  .barwrap { height: 12px; background: #e9ecef; border-radius: 99px; overflow: hidden; margin: 14px 0 8px; }
-  .bar { height: 100%; width: 0; background: #1e3a5f; transition: width .15s; }
-  .stat { font-size: 13px; color: #555; font-variant-numeric: tabular-nums; }
-  label { font-size: 13px; color: #555; display: block; margin-bottom: 6px; font-weight: 700; }
-  input { width: 100%; font: inherit; padding: 9px 11px; border: 1px solid #ccc; border-radius: 8px; }
-  .log { font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; background: #1a1a1a; color: #c8d4e0; border-radius: 10px; padding: 14px; height: 220px; overflow: auto; white-space: pre-wrap; line-height: 1.5; }
-  .err { color: #ff8585; }
-  .ok { color: #7fd99a; }
-  .pill { font-size: 12px; font-weight: 800; padding: 3px 9px; border-radius: 99px; background: #ffe0e0; color: #a01e26; }
+  :root{
+    --bg:#f0f2f5; --card:#fff; --ink:#1a1a1a; --sub:#555; --mute:#888;
+    --line:#dee2e6; --lineSoft:#e9ecef;
+    --navy:#1e3a5f; --navyDeep:#0f2844; --navyWash:#e8f0f7;
+    --gold:#d63031; --goldDeep:#a01e26; --goldWash:#ffe0e0;
+    --green:#4f8a4d; --greenDeep:#3c6d3b; --greenWash:#eaf3e7;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:'Nunito',system-ui,sans-serif; line-height:1.5;
+    padding:32px 20px 80px;
+  }
+  .wrap{max-width:860px; margin:0 auto;}
+  header{display:flex; align-items:flex-start; gap:14px; margin-bottom:6px;}
+  .mark{
+    flex-shrink:0; width:46px; height:46px; border-radius:13px;
+    background:var(--navyDeep); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:900; font-size:22px; box-shadow:0 4px 0 #081a30;
+  }
+  h1{margin:0; font-size:26px; font-weight:900; letter-spacing:-.4px; color:var(--navyDeep);}
+  .tag{margin:2px 0 0; font-size:13.5px; font-weight:700; color:var(--mute);}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:18px;
+    padding:20px 22px; margin-top:18px;
+    box-shadow:0 3px 10px rgba(15,40,68,.05);
+  }
+  .card h2{margin:0 0 4px; font-size:16px; font-weight:900; color:var(--navyDeep); letter-spacing:-.2px;}
+  .card p.lead{margin:0 0 14px; font-size:13.5px; font-weight:600; color:var(--sub);}
+  .note{
+    font-family:'Lora',Georgia,serif; font-size:14px; color:#55504a; line-height:1.6;
+  }
+  .row{display:flex; flex-wrap:wrap; gap:10px; align-items:center;}
+  button{
+    font-family:inherit; font-weight:800; font-size:14px; cursor:pointer;
+    border:none; border-radius:11px; padding:11px 18px; color:#fff;
+    background:var(--navy); box-shadow:0 3px 0 var(--navyDeep);
+    transition:transform .06s ease, box-shadow .06s ease;
+  }
+  button:active{transform:translateY(2px); box-shadow:0 1px 0 var(--navyDeep);}
+  button.gold{background:var(--gold); box-shadow:0 3px 0 var(--goldDeep);}
+  button.green{background:var(--green); box-shadow:0 3px 0 var(--greenDeep);}
+  button.ghost{background:#fff; color:var(--navyDeep); border:1.5px solid var(--line); box-shadow:0 3px 0 var(--lineSoft);}
+  button:disabled{opacity:.45; cursor:not-allowed; transform:none; box-shadow:0 3px 0 rgba(0,0,0,.1);}
+  .stats{display:flex; flex-wrap:wrap; gap:10px; margin-top:4px;}
+  .stat{
+    flex:1; min-width:120px; background:#fff; border:1px solid var(--line);
+    border-radius:13px; padding:12px 14px;
+  }
+  .stat .k{font-size:11px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:var(--mute);}
+  .stat .v{font-size:24px; font-weight:900; color:var(--navyDeep); margin-top:2px; font-variant-numeric:tabular-nums;}
+  .stat.ok .v{color:var(--greenDeep);}
+  .stat.err .v{color:var(--goldDeep);}
+  .bar{height:12px; border-radius:8px; background:var(--lineSoft); overflow:hidden; margin-top:14px;}
+  .bar > i{display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--navy),var(--green)); transition:width .2s ease;}
+  .barlabel{display:flex; justify-content:space-between; font-size:12px; font-weight:800; color:var(--sub); margin-top:8px;}
+  .controls{display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:8px;}
+  .field{display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:var(--sub);}
+  .field input[type=number]{
+    width:70px; font-family:inherit; font-weight:800; font-size:14px; color:var(--navyDeep);
+    border:1.5px solid var(--line); border-radius:9px; padding:7px 9px;
+  }
+  .log{
+    margin-top:14px; background:#0f2844; border-radius:13px; padding:14px 16px;
+    max-height:280px; overflow:auto;
+    font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.7; color:#cdd9e8;
+  }
+  .log .l-ok{color:#9fe0a0;}
+  .log .l-err{color:#ff9a9a;}
+  .log .l-info{color:#9cc2ef;}
+  .log .l-ref{color:#fff; font-weight:500;}
+  textarea{
+    width:100%; height:240px; margin-top:12px; resize:vertical;
+    font-family:'JetBrains Mono',monospace; font-size:11.5px; line-height:1.6;
+    border:1.5px solid var(--line); border-radius:13px; padding:14px; color:#243; background:#fbfcfd;
+  }
+  code{font-family:'JetBrains Mono',monospace; font-size:12.5px; background:var(--navyWash); color:var(--navyDeep); padding:2px 6px; border-radius:6px;}
+  ol.steps{margin:10px 0 0; padding-left:20px;}
+  ol.steps li{font-size:13.5px; font-weight:600; color:var(--sub); margin-bottom:6px;}
+  ol.steps b{color:var(--navyDeep);}
+  .pill{display:inline-block; font-size:11px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; padding:3px 9px; border-radius:999px;}
+  .pill.warn{background:var(--goldWash); color:var(--goldDeep);}
+  .hidden{display:none;}
+  .failbox{margin-top:12px; background:var(--goldWash); border-radius:12px; padding:12px 14px; font-size:12.5px; font-weight:700; color:var(--goldDeep);}
+  .failbox ul{margin:8px 0 0; padding-left:18px; font-family:'JetBrains Mono',monospace; font-weight:500; font-size:11.5px;}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>ESV Verse Harvester <span class="pill">DEV TOOL</span></h1>
-  <p class="sub">
-    Run this <strong>once, on the live site</strong> (codekaylem.github.io) — the only origin your
-    Cloudflare Worker allows. It reads every Scripture reference in the app, fetches the ESV text
-    through your Worker, then lets you download <code>app/verses.js</code>. Commit that file and the
-    app will load all verses locally — instant, offline, no API calls.
-  </p>
+  <header>
+    <div class="mark">C</div>
+    <div>
+      <h1>Verse Harvester</h1>
+      <p class="tag">Bakes every Read-tab proof-text into <code>app/verses.js</code> · ESV via your Worker</p>
+    </div>
+  </header>
 
   <div class="card">
-    <label for="worker">Worker URL</label>
-    <input id="worker" value="https://catchechism-esv.adriancalem.workers.dev" />
-    <div class="row" style="margin-top:14px;">
-      <button class="primary" id="go">Fetch all verses</button>
-      <button class="ghost" id="dl" disabled>Download verses.js</button>
-      <button class="ghost" id="copy" disabled>Copy to clipboard</button>
-    </div>
-    <div class="barwrap"><div class="bar" id="bar"></div></div>
-    <div class="stat" id="stat">Idle. Found <span id="count">0</span> unique references.</div>
+    <h2>Before you start <span class="pill warn">run on the live site</span></h2>
+    <p class="note">
+      This must be opened from your <b>deployed origin</b> (the GitHub Pages URL) — that is the only origin
+      your Cloudflare Worker allows to read the ESV API. Opening it from a local file or the editor preview
+      will fail CORS. Place this file at the repo root next to <code>app/</code> and visit it on the live site.
+    </p>
+    <ol class="steps">
+      <li>Commit <b>verse-harvester.html</b> and open it on your live site (e.g. <code>…github.io/<i>repo</i>/verse-harvester.html</code>).</li>
+      <li>Click <b>Fetch all verses</b> and let it run (it skips any already captured, so you can stop/resume).</li>
+      <li>When complete, click <b>Download verses.js</b> and commit it over the existing <code>app/verses.js</code>.</li>
+    </ol>
   </div>
 
   <div class="card">
-    <div class="log" id="log">Loading reference list…</div>
+    <h2>Harvest</h2>
+    <p class="lead">Citations are read live from <code>app/read-meta.js</code> using the exact same keys the app looks up.</p>
+
+    <div class="controls">
+      <div class="field">Worker
+        <input id="worker" type="text" style="width:340px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#243;border:1.5px solid var(--line);border-radius:9px;padding:7px 9px;" />
+      </div>
+    </div>
+    <div class="controls" style="margin-top:12px;">
+      <div class="field">Concurrency <input id="conc" type="number" min="1" max="8" value="3" /></div>
+      <div class="field">Delay (ms) <input id="delay" type="number" min="0" max="2000" step="50" value="120" /></div>
+      <div class="field"><label><input id="resume" type="checkbox" checked /> Skip already-captured</label></div>
+    </div>
+
+    <div class="stats" style="margin-top:18px;">
+      <div class="stat"><div class="k">Total keys</div><div class="v" id="s-total">—</div></div>
+      <div class="stat ok"><div class="k">Captured</div><div class="v" id="s-ok">0</div></div>
+      <div class="stat err"><div class="k">Failed</div><div class="v" id="s-err">0</div></div>
+      <div class="stat"><div class="k">Verses</div><div class="v" id="s-verses">0</div></div>
+    </div>
+
+    <div class="bar"><i id="bar"></i></div>
+    <div class="barlabel"><span id="bar-pct">0%</span><span id="bar-eta"></span></div>
+
+    <div class="row" style="margin-top:18px;">
+      <button id="go" class="green">Fetch all verses</button>
+      <button id="retry" class="ghost hidden">Retry failed</button>
+      <button id="stop" class="ghost hidden">Stop</button>
+      <button id="download" class="gold" disabled>Download verses.js</button>
+      <button id="copy" class="ghost" disabled>Copy to clipboard</button>
+    </div>
+
+    <div id="failbox" class="failbox hidden"></div>
+    <div class="log" id="log"><span class="l-info">Ready. Loading citations…</span></div>
+  </div>
+
+  <div class="card">
+    <h2>Output preview — <span id="out-keys">0</span> keys</h2>
+    <p class="lead">This is exactly what gets written to <code>app/verses.js</code>.</p>
+    <textarea id="out" spellcheck="false" placeholder="Generated verses.js will appear here after a harvest…"></textarea>
   </div>
 </div>
 
-<!-- Pull the real reference list straight from the app's metadata. -->
+<!-- The real citation source. Defines window.READING_META. -->
 <script src="app/read-meta.js"></script>
 <script>
-(function () {
-  var logEl = document.getElementById('log');
-  function log(msg, cls) {
-    var line = document.createElement('div');
-    if (cls) line.className = cls;
-    line.textContent = msg;
-    logEl.appendChild(line);
-    logEl.scrollTop = logEl.scrollHeight;
-  }
+(function(){
+  'use strict';
+  const DEFAULT_WORKER = 'https://catchechism-esv.adriancalem.workers.dev';
 
-  // ── Collect every unique citation, exactly as the app keys them ──
-  function collectRefs() {
-    var META = window.READING_META || {};
-    var set = [];
-    var seen = {};
-    Object.keys(META).forEach(function (ch) {
-      (META[ch] || []).forEach(function (section) {
-        (section.r || []).forEach(function (refString) {
-          refString.split(';').forEach(function (tok) {
-            var key = tok.replace(/\s+/g, ' ').trim();
-            if (key && !seen[key]) { seen[key] = 1; set.push(key); }
-          });
-        });
-      });
-    });
-    return set;
-  }
+  // ── DOM ──
+  const $ = id => document.getElementById(id);
+  const elLog = $('log');
+  const elBar = $('bar'), elPct = $('bar-pct'), elEta = $('bar-eta');
+  const elTotal = $('s-total'), elOk = $('s-ok'), elErr = $('s-err'), elVerses = $('s-verses');
+  const elOut = $('out'), elOutKeys = $('out-keys'), elFailbox = $('failbox');
 
-  // ── Parse the Worker's ESV-API JSON into [{n, t}] (same as the app) ──
-  function parsePassage(json) {
-    if (!json || json.error || !json.passages || !json.passages.length) return null;
-    var text = json.passages[0] || '';
-    var verses = [];
-    var re = /(\d+)\s+([^\d]*?)(?=\d+\s+|$)/g, m;
-    while ((m = re.exec(text)) !== null) {
-      var t = m[2].trim();
-      if (t) verses.push({ n: parseInt(m[1], 10), t: t });
+  $('worker').value = DEFAULT_WORKER;
+
+  // ── Same normalization the app uses (read.jsx esvKey) ──
+  function esvKey(ref){ return String(ref||'').replace(/\s+/g,' ').trim(); }
+
+  // ── Same parser the app uses (read.jsx parseEsvPassage) ──
+  function parseEsvPassage(text){
+    const verses = [];
+    const re = /\[(\d+)\]\s*([\s\S]*?)(?=\[\d+\]|$)/g;
+    let m;
+    while ((m = re.exec(text)) !== null){
+      const t = m[2].replace(/\s+/g,' ').trim();
+      if (t) verses.push({ n: parseInt(m[1],10), t });
     }
-    return verses.length ? verses : null;
-  }
-
-  var refs = collectRefs();
-  document.getElementById('count').textContent = refs.length;
-  logEl.textContent = '';
-  log('Found ' + refs.length + ' unique references across ' +
-      Object.keys(window.READING_META || {}).length + ' chapters.');
-
-  var RESULT = {};
-  var running = false;
-
-  async function fetchOne(base, ref) {
-    var url = base.replace(/\/$/, '') + '/?q=' + encodeURIComponent(ref);
-    var res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    var json = await res.json();
-    var verses = parsePassage(json);
-    if (!verses) throw new Error('no verses parsed');
     return verses;
   }
 
-  async function run() {
-    if (running) return;
-    running = true;
-    document.getElementById('go').disabled = true;
-    var base = document.getElementById('worker').value.trim();
-    var done = 0, failed = 0;
-    log('Starting fetch from ' + base + ' …');
-    for (var i = 0; i < refs.length; i++) {
-      var ref = refs[i];
-      try {
-        var verses = await fetchOne(base, ref);
-        RESULT[ref] = { verses: verses, source: 'esv' };
-        log('✓ ' + ref + '  (' + verses.length + ' v)', 'ok');
-      } catch (e) {
-        failed++;
-        log('✗ ' + ref + '  — ' + e.message, 'err');
-      }
-      done++;
-      document.getElementById('bar').style.width = (done / refs.length * 100) + '%';
-      document.getElementById('stat').textContent =
-        done + ' / ' + refs.length + ' done · ' + failed + ' failed';
-      await new Promise(function (r) { setTimeout(r, 120); }); // gentle rate-limit
+  // ── Build the unique key list exactly as the Read tab splits them ──
+  // read.jsx Section(): citations = citation.split(';').map(trim).filter
+  function buildKeys(){
+    const M = window.READING_META || {};
+    const set = new Set();
+    Object.keys(M).forEach(ch => {
+      (M[ch] || []).forEach(sec => {
+        (sec.r || []).forEach(rstr => {
+          rstr.split(';').map(c => esvKey(c)).filter(Boolean).forEach(c => set.add(c));
+        });
+      });
+    });
+    return Array.from(set);
+  }
+
+  let KEYS = [];
+  try {
+    KEYS = buildKeys();
+  } catch(e){
+    log('err', 'Could not read READING_META — is app/read-meta.js present? ' + e.message);
+  }
+
+  // store: key -> { verses:[{n,t}], source:'esv' }
+  const STORE = {};
+  const FAILED = new Set();
+  let running = false, stopFlag = false, startedAt = 0;
+
+  elTotal.textContent = KEYS.length;
+  log('info', 'Loaded ' + KEYS.length + ' unique citation keys from the confession.');
+
+  function log(kind, msg){
+    const span = document.createElement('div');
+    span.className = 'l-' + (kind==='ok'?'ok':kind==='err'?'err':'info');
+    span.innerHTML = (kind==='ok'?'✓ ':kind==='err'?'✕ ':'· ') + msg;
+    elLog.appendChild(span);
+    elLog.scrollTop = elLog.scrollHeight;
+  }
+
+  function refreshStats(){
+    const ok = Object.keys(STORE).length;
+    const err = FAILED.size;
+    const done = ok + err;
+    let vc = 0; for (const k in STORE) vc += (STORE[k].verses||[]).length;
+    elOk.textContent = ok;
+    elErr.textContent = err;
+    elVerses.textContent = vc;
+    const pct = KEYS.length ? Math.round(done/KEYS.length*100) : 0;
+    elBar.style.width = pct + '%';
+    elPct.textContent = pct + '%';
+    if (running && done > 0){
+      const elapsed = (Date.now()-startedAt)/1000;
+      const rate = done/elapsed;
+      const remain = Math.max(0, KEYS.length-done);
+      const eta = rate>0 ? Math.round(remain/rate) : 0;
+      elEta.textContent = remain>0 ? ('~'+fmtTime(eta)+' left') : 'done';
     }
-    log('\nDone. ' + (done - failed) + ' fetched, ' + failed + ' failed.',
-        failed ? 'err' : 'ok');
-    if (failed) log('Re-run to retry failures (successful ones are kept).');
-    document.getElementById('go').disabled = false;
-    document.getElementById('dl').disabled = false;
-    document.getElementById('copy').disabled = false;
+    $('download').disabled = ok===0;
+    $('copy').disabled = ok===0;
+    // failed list
+    if (FAILED.size){
+      elFailbox.classList.remove('hidden');
+      const arr = Array.from(FAILED);
+      elFailbox.innerHTML = FAILED.size + ' citation(s) failed — fix the Worker/network and click "Retry failed".'
+        + '<ul>' + arr.slice(0,40).map(k=>'<li>'+escapeHtml(k)+'</li>').join('') + (arr.length>40?'<li>…+'+(arr.length-40)+' more</li>':'') + '</ul>';
+      $('retry').classList.remove('hidden');
+    } else {
+      elFailbox.classList.add('hidden');
+      $('retry').classList.add('hidden');
+    }
+  }
+
+  function fmtTime(s){ if(s<60) return s+'s'; const m=Math.floor(s/60); return m+'m '+(s%60)+'s'; }
+  function escapeHtml(s){ return s.replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+  const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+  async function fetchOne(ref){
+    const base = $('worker').value.trim().replace(/\/$/,'');
+    const url = base + '/?q=' + encodeURIComponent(ref);
+    let res;
+    try { res = await fetch(url, { cache:'no-store' }); }
+    catch(e){ throw new Error('network/CORS — are you on the live origin?'); }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    let j; try { j = await res.json(); } catch(e){ throw new Error('bad JSON'); }
+    if (!j || j.error || !j.passages || !Array.isArray(j.passages) || !j.passages.length) throw new Error('empty passage');
+    const verses = parseEsvPassage(j.passages[0] || '');
+    if (!verses.length) throw new Error('no verses parsed');
+    return { verses, source:'esv' };
+  }
+
+  // worker-pool over a list of keys
+  async function harvest(keys){
+    if (running) return;
+    running = true; stopFlag = false; startedAt = Date.now();
+    $('go').disabled = true; $('retry').disabled = true;
+    $('stop').classList.remove('hidden');
+    const conc = Math.max(1, Math.min(8, parseInt($('conc').value)||3));
+    const delay = Math.max(0, parseInt($('delay').value)||0);
+    const skip = $('resume').checked;
+
+    const queue = keys.filter(k => !(skip && STORE[k]));
+    log('info', 'Harvesting ' + queue.length + ' citation(s) at concurrency ' + conc + '…');
+    let idx = 0;
+
+    async function worker(){
+      while (idx < queue.length && !stopFlag){
+        const k = queue[idx++];
+        try {
+          const data = await fetchOne(k);
+          STORE[k] = data;
+          FAILED.delete(k);
+          log('ok', '<span class="l-ref">'+escapeHtml(k)+'</span> · '+data.verses.length+' v');
+        } catch(e){
+          FAILED.add(k);
+          log('err', '<span class="l-ref">'+escapeHtml(k)+'</span> — '+escapeHtml(e.message));
+        }
+        refreshStats();
+        if (delay) await sleep(delay);
+      }
+    }
+    await Promise.all(Array.from({length:conc}, worker));
+
     running = false;
+    $('go').disabled = false; $('retry').disabled = false;
+    $('stop').classList.add('hidden');
+    elEta.textContent = stopFlag ? 'stopped' : 'done';
+    buildOutput();
+    log('info', stopFlag ? 'Stopped. '+Object.keys(STORE).length+' captured so far.'
+      : 'Finished. '+Object.keys(STORE).length+' captured, '+FAILED.size+' failed.');
+    if (!stopFlag && !FAILED.size) log('ok', 'All citations captured — download verses.js and commit it.');
   }
 
-  function buildFile() {
-    var header =
-      '/* Cornerstone — baked-in ESV verse store. GENERATED by verse-harvester.html.\n' +
-      '   ' + Object.keys(RESULT).length + ' references · ' + new Date().toISOString() + '\n' +
-      '   Scripture quotations from the ESV Bible. */\n';
-    return header + 'window.VERSES = ' + JSON.stringify(RESULT, null, 0) + ';\n';
+  function buildOutput(){
+    const keys = Object.keys(STORE).sort();
+    const header =
+`/* Cornerstone — baked-in ESV verse store.
+   Keyed by the exact citation string used in app/read-meta.js (semicolon-split),
+   e.g. "2 Timothy 3:15-17". Each value is { verses: [{ n, t }], source: "esv" }.
+
+   GENERATED by verse-harvester.html on the live site.
+   Generated: ${new Date().toISOString()}
+   ${keys.length} citations.
+
+   To (re)generate: open verse-harvester.html on the deployed origin,
+   click "Fetch all verses", then "Download verses.js" and commit the result here.
+
+   Scripture quotations are from the ESV Bible, © Crossway. */
+window.VERSES = window.VERSES || {};
+Object.assign(window.VERSES, {
+`;
+    const body = keys.map(k => {
+      const v = STORE[k];
+      return '  ' + JSON.stringify(k) + ': ' + JSON.stringify(v) + ',';
+    }).join('\n');
+    const text = header + body + '\n});\n';
+    elOut.value = text;
+    elOutKeys.textContent = keys.length;
+    return text;
   }
 
-  document.getElementById('go').onclick = run;
-  document.getElementById('dl').onclick = function () {
-    var blob = new Blob([buildFile()], { type: 'text/javascript' });
-    var a = document.createElement('a');
+  function download(){
+    const text = elOut.value || buildOutput();
+    const blob = new Blob([text], { type:'text/javascript' });
+    const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = 'verses.js';
-    a.click();
-    log('Downloaded verses.js — commit it to app/verses.js', 'ok');
-  };
-  document.getElementById('copy').onclick = function () {
-    navigator.clipboard.writeText(buildFile()).then(function () {
-      log('Copied verses.js contents to clipboard.', 'ok');
-    });
-  };
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    log('info', 'Downloaded verses.js — commit it to app/verses.js.');
+  }
+
+  // ── wire up ──
+  $('go').addEventListener('click', ()=>harvest(KEYS));
+  $('retry').addEventListener('click', ()=>harvest(Array.from(FAILED)));
+  $('stop').addEventListener('click', ()=>{ stopFlag = true; log('info','Stopping after in-flight requests…'); });
+  $('download').addEventListener('click', download);
+  $('copy').addEventListener('click', async ()=>{
+    const text = elOut.value || buildOutput();
+    try { await navigator.clipboard.writeText(text); log('ok','Copied verses.js to clipboard.'); }
+    catch(e){ elOut.select(); log('info','Clipboard blocked — text selected, press Cmd/Ctrl+C.'); }
+  });
+
+  refreshStats();
 })();
 </script>
 </body>
