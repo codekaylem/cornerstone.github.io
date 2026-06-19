@@ -1,13 +1,4 @@
-// Cornerstone — ESV API proxy + one-shot verse harvester (Cloudflare Worker)
-// Holds the ESV API token as a SECRET env var (ESV_TOKEN) so it is never
-// exposed in the public site. Two routes:
-//   GET /            ?q=<ref>   → proxies a single lookup to the ESV API (CORS-enabled)
-//   GET /harvest                → fetches EVERY reference the app uses and returns
-//                                  a ready-to-commit app/verses.js download.
-//
-// Deploy: paste this whole file into the Worker editor → Deploy.
-// Then visit  https://<worker-url>/harvest  once, save the downloaded verses.js
-// into app/verses.js, and commit it. Done — the app reads verses locally after that.
+
 
 const ALLOWED_ORIGINS = [
   'https://codekaylem.github.io',
