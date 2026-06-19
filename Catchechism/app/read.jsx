@@ -28,8 +28,9 @@ const ESV_PROXY_BASE = 'https://catchechism-esv.adriancalem.workers.dev';
 async function bibleFetchPassage(ref) {
   // Worker accepts ?q=<reference> and proxies to the ESV API with the secret token.
   const url = ESV_PROXY_BASE + '/?q=' + encodeURIComponent(ref);
-  let res; try { res = await fetch(url); } catch (e) { throw new Error('cors'); }
-  let j; try { j = await res.json(); } catch (e) { throw new Error('cors'); }
+  let res; try { res = await fetch(url, { cache: 'no-store' }); } catch (e) { throw new Error('cors'); }
+  if (!res.ok) throw new Error('http_' + res.status);
+  let j; try { j = await res.json(); } catch (e) { throw new Error('parse'); }
   if (!j || j.error || !j.passages || !Array.isArray(j.passages) || !j.passages.length) throw new Error('shape');
   // Parse the passage text: split by verse numbers and extract each verse
   const passageText = j.passages[0] || '';
