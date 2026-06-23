@@ -1,69 +1,60 @@
-# Cornerstone — Deployment Guide (GitHub Pages + Cloudflare Worker)
+# Cornerstone — Deployment Guide (GitHub Pages)
 
-Your app is published as **static files on GitHub Pages**. The ESV API token must
-**never** be in those files (anyone could read it). Instead, a tiny **Cloudflare
-Worker** holds the token as a secret and proxies requests to the ESV API.
+The app is plain **static files**. The ESV API token is embedded directly in
+`app/read.jsx`, so there is **no server, Worker, or backend** — you just push the
+files to GitHub Pages and you're live.
 
 ```
-Browser (GitHub Pages)  →  Cloudflare Worker (token hidden)  →  ESV API
+Browser (GitHub Pages)  →  ESV API   (token in app/read.jsx)
+                        →  window.VERSES (app/verses.js, when populated)
 ```
+
+How the Read tab gets verse text:
+1. **`app/verses.js`** (`window.VERSES`) is checked first — instant, offline.
+2. Anything not baked in is fetched from the **ESV API** with the embedded token,
+   then cached in the browser's `localStorage` (fetched once per device).
+
+> ⚠️ The token is visible to anyone who views source. That's an accepted trade-off
+> for a public reader. Don't reuse this token anywhere sensitive; if it's ever
+> abused, revoke/rotate it at https://api.esv.org/ and paste a new one into
+> `app/read.jsx` (`ESV_API_TOKEN`).
 
 ---
 
-## Part A — Deploy the Cloudflare Worker (one time, ~5 min)
+## Publish to GitHub Pages
 
-1. Go to **https://dash.cloudflare.com** → sign up / log in (free).
-2. **Workers & Pages** → **Create** → **Create Worker**.
-3. Name it `catchechism-esv` (this becomes part of the URL).
-   - Your Worker URL will be:
-     `https://catchechism-esv.<your-cloudflare-subdomain>.workers.dev`
-4. Click **Deploy**, then **Edit code**, and replace everything with the code in
-   `worker/esv-proxy.js` (in this project). Click **Deploy** again.
-5. **Settings → Variables and Secrets → Add**:
-   - Type: **Secret (encrypted)**
-   - Name: `ESV_TOKEN`
-   - Value: *paste your ESV API token here* (get one free at
-     https://api.esv.org/ — keep it out of any committed file)
-   - **Save and deploy.**
-
-> The token now lives only on Cloudflare. It is never shipped to the browser.
-
----
-
-## Part B — Point the app at your Worker
-
-Open `app/read.jsx` and confirm this line matches your real Worker URL:
-
-```js
-const ESV_PROXY_BASE = 'https://catchechism-esv.adriancalem.workers.dev';
-```
-
-If your Cloudflare subdomain is different, update it here. (Tell me the real URL
-and I'll set it for you.)
-
----
-
-## Part C — Publish to GitHub Pages
-
-1. Push your files to **https://github.com/codekaylem/cornerstone.github.io**
+1. Push every file in this project to your repo
+   (e.g. **https://github.com/codekaylem/cornerstone.github.io**), keeping the
+   folder structure (`index.html` at the root, `app/` alongside it).
 2. In the repo: **Settings → Pages → Build and deployment → Source: Deploy from a
-   branch**, pick `main` / `root`, **Save**.
-3. Your site goes live at **https://codekaylem.github.io/cornerstone.github.io/**
+   branch** → pick `main` / `root` → **Save**.
+3. Site goes live at **https://codekaylem.github.io/cornerstone.github.io/**
+   (give it a minute on first publish).
+
+`index.html` is the entry point and already loads `app/verses.js` + `app/read.jsx`.
 
 ---
 
 ## Verify
 
-- Open the live site, go to **Read**, tap a verse reference.
-- If text loads → the Worker + token are wired correctly. ✅
-- If you see *"AI-generated ESV text"* → the Worker call failed; double-check the
-  Worker URL, the `ESV_TOKEN` secret, and the CORS origin in the Worker code.
+- Open the live site → **Read** → tap a verse reference.
+- Text loads → the embedded token works. ✅
+- "Couldn't load this passage" → check the token is valid and that
+  api.esv.org is reachable.
+
+---
+
+## Optional — fully offline (no API at all)
+
+To bake every passage in so the live site never calls the API:
+1. Open **verse-harvester.html** on the live site, click **Fetch all verses**.
+2. Click **Download verses.js**, commit it over `app/verses.js`, push.
+
+After that, `window.VERSES` answers every lookup and the ESV API is never hit.
 
 ---
 
 ## Notes
-- **Free tiers:** Cloudflare Workers = 100,000 requests/day. Plenty.
-- **CORS origin:** the Worker only allows `https://codekaylem.github.io`. If you
-  later use a custom domain, add it to the `ALLOWED_ORIGINS` list in the Worker.
-- **AI fallback:** if the Worker is ever down, the app falls back to
-  Claude-generated ESV text so users still see something.
+- The `worker/` folder and the old Cloudflare Worker are **no longer used** — the
+  token is now in the client. You can delete `worker/` if you like.
+- **ESV API free tier** is generous for a personal reader; caching keeps usage low.

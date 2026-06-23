@@ -8,93 +8,72 @@ const READ_FS_KEY = 'cornerstone_read_fs_v1';
 const READ_POS_KEY = 'cornerstone_read_pos_v1';
 const FS_STEPS = [14.5, 16.5, 18.5, 20.5];
 
-// ── Live ESV passage lookup (via the built-in Claude helper), cached ──
+// ── ESV passage lookup: baked-in store first, then direct ESV API ──
+// window.VERSES (app/verses.js) is checked first — instant + offline. Anything
+// missing is fetched on demand straight from the ESV API and cached locally.
+const ESV_API_BASE = 'https://api.esv.org/v3/passage/text/';
+const ESV_API_TOKEN = '05ec676a3f14b5bfb25b1d2dc390525533ebaf4b';
 const ESV_CACHE_KEY = 'cornerstone_esv_v1';
+
+function esvKey(ref) {
+  return String(ref || '').replace(/\s+/g, ' ').trim();
+}
 function esvCacheGet(ref) {
-  try { return (JSON.parse(localStorage.getItem(ESV_CACHE_KEY)) || {})[ref] || null; } catch (e) { return null; }
+  try { return (JSON.parse(localStorage.getItem(ESV_CACHE_KEY)) || {})[esvKey(ref)] || null; } catch (e) { return null; }
 }
 function esvCacheSet(ref, data) {
   try {
     const c = JSON.parse(localStorage.getItem(ESV_CACHE_KEY)) || {};
-    c[ref] = data;
+    c[esvKey(ref)] = data;
     localStorage.setItem(ESV_CACHE_KEY, JSON.stringify(c));
   } catch (e) {}
 }
-// ── ESV source: ESV text via Cloudflare Worker proxy (keeps token secret) ──
-// The Worker holds the ESV API token as a secret env var; the client never sees it.
-// Deploy the Worker (see project README), then set this to your Worker URL:
-const ESV_PROXY_BASE = 'https://catchechism-esv.adriancalem.workers.dev';
-
-async function bibleFetchPassage(ref) {
-  // Worker accepts ?q=<reference> and proxies to the ESV API with the secret token.
-  const url = ESV_PROXY_BASE + '/?q=' + encodeURIComponent(ref);
-  let res; try { res = await fetch(url, { cache: 'no-store' }); } catch (e) { throw new Error('cors'); }
+function lookupEsv(ref) {
+  const store = window.VERSES || {};
+  const hit = store[esvKey(ref)] || store[ref];
+  if (hit && hit.verses && hit.verses.length) return { verses: hit.verses, source: 'local' };
+  return null;
+}
+// Parse ESV text output. Verse numbers come bracketed: "[16] For God so loved…".
+function parseEsvPassage(text) {
+  const verses = [];
+  const re = /\[(\d+)\]\s*([\s\S]*?)(?=\[\d+\]|$)/g;
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    const t = m[2].replace(/\s+/g, ' ').trim();
+    if (t) verses.push({ n: parseInt(m[1], 10), t });
+  }
+  return verses;
+}
+async function fetchEsvApi(ref) {
+  const url = ESV_API_BASE + '?' + [
+    'q=' + encodeURIComponent(ref),
+    'include-headings=false',
+    'include-footnotes=false',
+    'include-verse-numbers=true',
+    'include-short-copyright=false',
+    'include-passage-references=false',
+  ].join('&');
+  let res;
+  try { res = await fetch(url, { headers: { Authorization: 'Token ' + ESV_API_TOKEN } }); }
+  catch (e) { throw new Error('network'); }
   if (!res.ok) throw new Error('http_' + res.status);
   let j; try { j = await res.json(); } catch (e) { throw new Error('parse'); }
-  if (!j || j.error || !j.passages || !Array.isArray(j.passages) || !j.passages.length) throw new Error('shape');
-  // Parse the passage text: split by verse numbers and extract each verse
-  const passageText = j.passages[0] || '';
-  const verses = [];
-  // ESV API returns text with verse numbers inline (e.g., "19 So then...")
-  // Split on verse number patterns and collect verse/text pairs
-  const versePattern = /(\d+)\s+([^\d]*?)(?=\d+\s+|$)/g;
-  let match;
-  while ((match = versePattern.exec(passageText)) !== null) {
-    const n = parseInt(match[1]);
-    const t = match[2].trim();
-    if (t) verses.push({ n, t });
-  }
+  if (!j || !j.passages || !j.passages.length) throw new Error('shape');
+  const verses = parseEsvPassage(j.passages[0] || '');
   if (!verses.length) throw new Error('novs');
   return { verses, source: 'esv' };
 }
-
-async function fetchAiEsv(ref) {
-  if (!(window.claude && window.claude.complete)) throw new Error('offline');
-  const prompt = [
-    'You are a Scripture text service. Return the English Standard Version (ESV) text for the reference below.',
-    'Reference: ' + ref,
-    'Respond with ONLY valid minified JSON — no markdown, no prose — shaped exactly:',
-    '{"verses":[{"n":<verse number as integer>,"t":"<verse text>"}]}',
-    'Expand verse ranges (e.g. 3:15-17) and comma lists (e.g. 16:29, 31) into one object per verse.',
-    'Keep the original ESV wording and punctuation. Do not include commentary, headings, or cross-reference letters.',
-  ].join('\n');
-  const raw = await window.claude.complete(prompt);
-  const a = raw.indexOf('{'), b = raw.lastIndexOf('}');
-  if (a < 0 || b < 0) throw new Error('parse');
-  const data = JSON.parse(raw.slice(a, b + 1));
-  if (!data || !Array.isArray(data.verses) || !data.verses.length) throw new Error('shape');
-  return { verses: data.verses, source: 'ai' };
-}
-
-// Normalize a citation for lookup (collapse whitespace, trim).
-function esvKey(ref) {
-  return String(ref || '').replace(/\s+/g, ' ').trim();
-}
-
 async function fetchEsv(ref) {
-  // 1) Local baked-in store (window.VERSES from app/verses.js) — instant, offline, no API.
-  const store = window.VERSES || {};
-  const local = store[esvKey(ref)] || store[ref];
-  if (local && local.verses && local.verses.length) {
-    return { verses: local.verses, source: 'local' };
-  }
-  // 2) localStorage cache from a prior live fetch.
+  const local = lookupEsv(ref);
+  if (local) return local;
   const cached = esvCacheGet(ref);
-  if (cached && cached.source === 'esv') return cached;
-  if (cached && !cached.source) return cached;
-  // 3) Live Worker proxy (only works on the deployed origin).
-  try {
-    const d = await bibleFetchPassage(ref);
-    esvCacheSet(ref, d);
-    return d;
-  } catch (e) {
-    if (cached) return cached;
-    const d = await fetchAiEsv(ref);
-    esvCacheSet(ref, d);
-    return d;
-  }
+  if (cached && cached.verses && cached.verses.length) return cached;
+  const d = await fetchEsvApi(ref);
+  esvCacheSet(ref, d);
+  return d;
 }
-Object.assign(window, { bibleFetchPassage, esvKey });
+Object.assign(window, { esvKey, lookupEsv, fetchEsv });
 
 // ── A pinned chapter header that you can tap to open the chapter list ──
 function ChapterStickyHeader({ chapter, title, theme, onOpen }) {
@@ -270,12 +249,6 @@ function PassageModal({ open, clause, citations, theme, onClose }) {
   const tc = themeColors(theme || 'gold');
   const [res, setRes] = React.useState({});
 
-  const load = React.useCallback(async (cit) => {
-    setRes(r => ({ ...r, [cit]: { loading: true } }));
-    try { const d = await fetchEsv(cit); setRes(r => ({ ...r, [cit]: { verses: d.verses } })); }
-    catch (e) { setRes(r => ({ ...r, [cit]: { error: e && e.message === 'offline' ? 'offline' : 'error' } })); }
-  }, []);
-
   React.useEffect(() => {
     if (!open || !citations) return;
     let dead = false;
@@ -286,7 +259,7 @@ function PassageModal({ open, clause, citations, theme, onClose }) {
         setRes(r => ({ ...r, [cit]: { loading: true } }));
         let out;
         try { const d = await fetchEsv(cit); out = { verses: d.verses }; }
-        catch (e) { out = { error: e && e.message === 'offline' ? 'offline' : 'error' }; }
+        catch (e) { out = { error: 'error' }; }
         if (dead) break;
         setRes(r => ({ ...r, [cit]: out }));
       }
@@ -326,29 +299,16 @@ function PassageModal({ open, clause, citations, theme, onClose }) {
                 <div style={{ fontFamily: FUI, fontWeight: 800, fontSize: 15, color: tc.deep, marginBottom: 7 }}>{cit}</div>
                 {r.loading && <VerseSkeleton />}
                 {r.verses && (
-                  <>
-                    <p style={{ margin: 0, fontFamily: FSERIF, fontSize: 15, lineHeight: 1.62, color: '#3c3a36', textWrap: 'pretty' }}>
-                      {r.verses.map((v, k) => (
-                        <React.Fragment key={k}>
-                          <sup style={{ fontWeight: 800, fontSize: '0.72em', color: C.navyDeep, marginRight: 2 }}>{v.n}</sup>
-                          {v.t}{k < r.verses.length - 1 ? ' ' : ''}
-                        </React.Fragment>
-                      ))}
-                    </p>
-                    {r.source === 'ai' && (
-                      <div style={{ ...muted, marginTop: 6, fontSize: 11.5, color: C.mute, fontStyle: 'italic' }}>
-                        (AI-generated ESV text — ESV API unavailable)
-                      </div>
-                    )}
-                  </>
+                  <p style={{ margin: 0, fontFamily: FSERIF, fontSize: 15, lineHeight: 1.62, color: '#3c3a36', textWrap: 'pretty' }}>
+                    {r.verses.map((v, k) => (
+                      <React.Fragment key={k}>
+                        <sup style={{ fontWeight: 800, fontSize: '0.72em', color: C.navyDeep, marginRight: 2 }}>{v.n}</sup>
+                        {v.t}{k < r.verses.length - 1 ? ' ' : ''}
+                      </React.Fragment>
+                    ))}
+                  </p>
                 )}
-                {r.error === 'offline' && <div style={muted}>Open this in the Cornerstone app to load the ESV text.</div>}
-                {r.error === 'error' && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={muted}>Couldn't load this passage.</span>
-                    <Press onClick={() => load(cit)} style={{ background: tc.wash, color: tc.deep, fontWeight: 800, fontSize: 12, borderRadius: 8, padding: '5px 10px' }}>Retry</Press>
-                  </div>
-                )}
+                {r.error && <div style={muted}>Couldn't load this passage. Check your connection and reopen.</div>}
               </div>
             );
           })}
