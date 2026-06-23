@@ -1,0 +1,21 @@
+{
+  "name": "Cornerstone — Learn the 1689",
+  "short_name": "Cornerstone",
+  "description": "Read and learn the 1689 London Baptist Confession of Faith — chapter by chapter, with Scripture proofs.",
+  "id": "/cornerstone.github.io/",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f2844",
+  "theme_color": "#0f2844",
+  "categories": ["education", "books", "lifestyle"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
